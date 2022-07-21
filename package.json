@@ -1,0 +1,22 @@
+{
+  "name": "back-end_course",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:shuliakleonid/Backend-01-Monday-.git",
+  "author": "lshuliak <zeleny777@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "scripts": {
+    "dev": "nodemon --inspect dist/index.js",
+    "watch": "tsc -w "
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^18.0.6",
+    "nodemon": "^2.0.19",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  }
+}
