@@ -1,8 +1,8 @@
 import Router from 'express'
-
+import {Video} from '../controllers'
 const router = Router();
 
-const videos = [
+export const videos = [
     {id: 1, title: 'About JS - 01', author: 'it-incubator.eu'},
     {id: 2, title: 'About JS - 02', author: 'it-incubator.eu'},
     {id: 3, title: 'About JS - 03', author: 'it-incubator.eu'},
@@ -10,9 +10,7 @@ const videos = [
     {id: 5, title: 'About JS - 05', author: 'it-incubator.eu'},
 ]
 
-router.get('', (req, res) => {
-    res.send(videos)
-})
+router.get('', Video.allVideo)
 router.get('/:id', (req, res) => {
     const id = +req.params.id
     const video = videos.find((v) => v.id === id)
