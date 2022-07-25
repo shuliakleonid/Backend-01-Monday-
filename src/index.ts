@@ -1,6 +1,7 @@
 import express from 'express'
 import bodyParser from "body-parser";
 import {postsRouter, videoRouter} from "./routes";
+import {bloggersRouter} from "./routes/bloggers";
 
 const app = express()
 const port = process.env.PORT || 6000
@@ -24,6 +25,7 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 app.use('/videos', videoRouter);
+app.use('/bloggers', bloggersRouter);
 app.use('/posts', postsRouter);
 // /* get with query */
 // app.get('/products', (req, res) => {

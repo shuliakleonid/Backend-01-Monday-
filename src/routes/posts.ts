@@ -1,8 +1,9 @@
 import Router from 'express'
+import {bloggers} from "./bloggers";
 
 const router = Router();
 
-export const posts = [
+const posts = [
     {
         id: 0,
         title: 'Title of post ',
@@ -58,26 +59,23 @@ router.get('/:id', (req, res) => {
 
 const errorMessage = (field: string, message: string) => {
     return {
-        "errorsMessages": [
-            {
                 "message": message,
                 "field": field
             }
-        ]
-    }
 }
 
 router.post('', (req, res) => {
-
+    const errorsMessages = []
 
     const {title, shortDescription, content, bloggerId} = req.body
-    if (!title) {
-        return res.status(400).send(errorMessage('title', 'Title is undefined'))
-    }
-    if (title && title.length >= 30) return res.status(400).send(errorMessage('title', 'Title is too long max 40 symbols'))
-    if (!shortDescription || shortDescription.length >= 100) return res.status(400).send(errorMessage('shortDescription', 'shortDescription'))
-    if (!content || content.length >= 1000) return res.status(400).send(errorMessage('content', 'content'))
+    const blogger = bloggers.find(b => b.id === bloggerId)
 
+    if (!title?.trim() || title.length >= 30) errorsMessages.push(errorMessage('title', 'Title is too long max 40 symbols'))
+    if (!shortDescription?.trim() || shortDescription.length >= 100) errorsMessages.push(errorMessage('shortDescription', 'shortDescription'))
+    if (!content?.trim() || content.length >= 1000) errorsMessages.push(errorMessage('content', 'content'))
+    if (!blogger) errorsMessages.push(errorMessage('bloggerId', 'bloggerId'))
+
+    if(errorsMessages.length > 0) return res.status(400).send({errorsMessages:errorsMessages})
 
     if (title && shortDescription && content && bloggerId) {
         const newPost = {
@@ -103,14 +101,19 @@ router.post('', (req, res) => {
 })
 
 router.put('/:id', (req, res) => {
+    const errorsMessages = []
+
     const id = +req.params.id
     const {title, shortDescription, content, bloggerId} = req.body
-    if (!title) {
-        return res.status(400).send(errorMessage('title', 'Title is too long max 40 symbols'))
-    }
-    if (title.length > 40) return res.status(400).send(errorMessage('title', 'Title is too long max 40 symbols'))
-    if (!shortDescription || shortDescription.length >= 100) return res.status(400).send(errorMessage('shortDescription', 'shortDescription'))
-    if (!content || content.length >= 1000) return res.status(400).send(errorMessage('content', 'content'))
+    const blogger = bloggers.find(b => b.id === bloggerId)
+
+    if (!title?.trim() || title?.length >= 30) errorsMessages.push(errorMessage('title', 'Title is too long max 40 symbols'))
+    if ( !shortDescription?.trim() || shortDescription?.length >= 100) errorsMessages.push(errorMessage('shortDescription', 'shortDescription'))
+    if (content && !content?.trim() || content?.length >= 1000) errorsMessages.push(errorMessage('content', 'content'))
+    if (!blogger) errorsMessages.push(errorMessage('bloggerId', 'bloggerId'))
+
+    if(errorsMessages.length > 0) return res.status(400).send({errorsMessages:errorsMessages})
+
 
     const index = posts.findIndex(v => v.id === id)
     if (index >= 0) {
