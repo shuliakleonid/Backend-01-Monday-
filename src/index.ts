@@ -1,7 +1,6 @@
 import express from 'express'
 import bodyParser from "body-parser";
-import cors from 'cors'
-import {videoRouter} from "./routes";
+import {postsRouter, videoRouter} from "./routes";
 
 const app = express()
 const port = process.env.PORT || 6000
@@ -9,7 +8,6 @@ const port = process.env.PORT || 6000
 const parserMiddleware = bodyParser({})
 
 app.use(parserMiddleware)
-// app.use(cors({origin: '*'}))
 
 
 
@@ -26,6 +24,7 @@ app.get('/', (req, res) => {
     res.send('Hello World!')
 })
 app.use('/videos', videoRouter);
+app.use('/posts', postsRouter);
 // /* get with query */
 // app.get('/products', (req, res) => {
 //     const title = req.query.title
