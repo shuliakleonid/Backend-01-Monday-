@@ -1,5 +1,6 @@
 import Router from 'express'
 import {bloggers} from "./bloggers";
+import {basicAuth} from '../helpers';
 
 const router = Router();
 
@@ -64,7 +65,7 @@ const errorMessage = (field: string, message: string) => {
             }
 }
 
-router.post('', (req, res) => {
+router.post('',basicAuth, (req, res) => {
     const errorsMessages = []
 
     const {title, shortDescription, content, bloggerId} = req.body
@@ -100,7 +101,7 @@ router.post('', (req, res) => {
     }
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id',basicAuth, (req, res) => {
     const errorsMessages = []
 
     const id = +req.params.id
@@ -133,7 +134,8 @@ router.put('/:id', (req, res) => {
     }
 
 })
-router.delete('/:id', ((req, res) => {
+
+router.delete('/:id',basicAuth, (req, res) => {
     const id = +req.params.id
     const index = posts.findIndex(v => v.id === id)
     if (index >= 0) {
@@ -142,7 +144,7 @@ router.delete('/:id', ((req, res) => {
     } else {
         res.send(404)
     }
-}))
+})
 
 
 export {router as postsRouter}
