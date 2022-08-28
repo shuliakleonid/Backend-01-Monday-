@@ -31,7 +31,16 @@ export const bloggers = [
     },
 ]
 
+const errorMessage = (field: string, message: string) => {
+    return {
+                "message": message,
+                "field": field
+            }
+
+}
+
 router.get('', (req, res) => {
+    
     res.send(bloggers)
 })
 
@@ -46,13 +55,9 @@ router.get('/:id', (req, res) => {
 
 })
 
-const errorMessage = (field: string, message: string) => {
-    return {
-                "message": message,
-                "field": field
-            }
+router.get('/:bloggersId/posts', (req, res)=> {
 
-}
+})
 
 router.post('',basicAuth, (req, res) => {
     const pattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/

@@ -2,6 +2,7 @@ import express from 'express'
 import bodyParser from "body-parser";
 import {postsRouter, videoRouter} from "./routes";
 import {bloggersRouter} from "./routes/bloggers";
+import { runDb } from './repositories/db';
 
 const app = express()
 const port = process.env.PORT || 6000
@@ -9,7 +10,6 @@ const port = process.env.PORT || 6000
 const parserMiddleware = bodyParser({})
 
 app.use(parserMiddleware)
-
 
 
 
@@ -95,5 +95,6 @@ app.use('/posts', postsRouter);
 // })
 
 app.listen(port, () => {
+    runDb()
     console.log(`Example app listening on port ${port}`)
 })
