@@ -6,10 +6,10 @@ import { postsRepository } from '../repositories/posts';
 const router = Router();
 
 export type Bloggers = {
-    id: number;
-    name: string;
-    youtubeUrl: string;
-}
+  id: number;
+  name: string;
+  youtubeUrl: string;
+};
 
 export const bloggers = [
   {
@@ -62,6 +62,27 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.get('/:bloggerId/posts', async (req, res) => {
+  const title = req.query.title?.toString();
+  const pageNumber = req.query.pageNumber || 0;
+  const pageSize = req.query.PageSize || 10;
+
+  const pagination = {
+    pagesCount: pageNumber,
+    page: 0,
+    pageSize: pageSize,
+    totalCount: 0,
+  };
+
+  const bloggers = await bloggersRepository.findBloggers(title, +pageNumber, +pageSize);
+
+  if (bloggers) {
+    res.send(bloggers);
+  } else {
+    res.send(404);
+  }
+});
+
 router.post('', basicAuth, async (req, res) => {
   const pattern =
     /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
@@ -82,7 +103,6 @@ router.post('', basicAuth, async (req, res) => {
     return res.status(400).send({ errorsMessages: errorsMessages });
 
   if (name?.trim() && youtubeUrl) {
-   
     const newBlogger = await bloggersRepository.createBlogger(name, youtubeUrl);
 
     res.status(201).send(newBlogger);

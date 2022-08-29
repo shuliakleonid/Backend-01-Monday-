@@ -1,4 +1,4 @@
-import { Bloggers, bloggers } from './../routes/bloggers';
+import { Bloggers } from './../routes/bloggers';
 import Router from 'express';
 import { pathToFileURL } from 'url';
 import { basicAuth } from '../helpers';
@@ -7,7 +7,7 @@ import { Post } from './../routes/posts';
 import { client } from './db';
 
 export const bloggersRepository = {
-  async findBloggers(title: string | null | undefined): Promise<Bloggers[]> {
+  async findBloggers(title: string | null | undefined, pageNumber?: number, pageSize?: number): Promise<Bloggers[]> {
     if (title) {
       return client
         .db('blog')
@@ -15,7 +15,7 @@ export const bloggersRepository = {
         .find({ title: { $regex: title } })
         .toArray();
     } else {
-      return client.db('blog').collection<Post>('bloggers').find({}).toArray();
+      return client.db('blog').collection<Bloggers>('bloggers').find({}).toArray();
     }
   },
 
@@ -72,7 +72,7 @@ export const bloggersRepository = {
   async deleteBloggers(id: number): Promise<boolean> {
     const result = await client
       .db('blog')
-      .collection<Post>('bloggers')
+      .collection<Bloggers>('bloggers')
       .deleteOne({ id: id });
 
     return result.deletedCount === 1;
