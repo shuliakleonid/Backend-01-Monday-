@@ -1,5 +1,6 @@
 import Router from 'express';
 import { basicAuth } from '../helpers';
+import { bloggersRepository } from '../repositories/bloggers';
 import { postsRepository } from '../repositories/posts';
 import { bloggers } from './bloggers';
 
@@ -63,9 +64,9 @@ router.get('', async (req, res) => {
   res.send(posts);
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
   const id = +req.params.id;
-  const post = posts.find((v) => v.id === id);
+  const post = await postsRepository.findPostById(id);
   if (post) {
     res.send(post);
   } else {
@@ -84,7 +85,9 @@ router.post('', basicAuth, async (req, res) => {
   const errorsMessages = [];
 
   const { title, shortDescription, content, bloggerId } = req.body;
-  const blogger = bloggers.find((b) => b.id === bloggerId);
+
+  const blogger = await bloggersRepository.findBloggerById(bloggerId);
+
 
   if (!title?.trim() || title.length >= 30)
     errorsMessages.push(
@@ -100,14 +103,7 @@ router.post('', basicAuth, async (req, res) => {
     return res.status(400).send({ errorsMessages: errorsMessages });
 
   if (title && shortDescription && content && bloggerId) {
-    const newPost = {
-      id: posts.length + 1,
-      title,
-      shortDescription: 'Description of post',
-      content,
-      bloggerId,
-      bloggerName: 'Name of Blogger',
-    };
+   
     const createdPost = await postsRepository.createPost(
       title,
       content,
@@ -126,7 +122,7 @@ router.post('', basicAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', basicAuth, (req, res) => {
+router.put('/:id', basicAuth, async (req, res) => {
   const errorsMessages = [];
 
   const id = +req.params.id;
@@ -146,11 +142,9 @@ router.put('/:id', basicAuth, (req, res) => {
   if (errorsMessages.length > 0)
     return res.status(400).send({ errorsMessages: errorsMessages });
 
-  const index = posts.findIndex((v) => v.id === id);
-  if (index >= 0) {
-    console.log(posts[index]);
-    console.log({ ...posts[index], ...req.body });
-    posts[index] = { ...posts[index], ...req.body };
+  const isUpdated = await postsRepository.updatePost(id,title, content, bloggerId);
+
+  if (isUpdated) {
     res.send(204);
   } else {
     res.status(404).send({
@@ -164,11 +158,10 @@ router.put('/:id', basicAuth, (req, res) => {
   }
 });
 
-router.delete('/:id', basicAuth, (req, res) => {
+router.delete('/:id', basicAuth, async (req, res) => {
   const id = +req.params.id;
-  const index = posts.findIndex((v) => v.id === id);
-  if (index >= 0) {
-    posts.splice(index, 1);
+  const isDeleted = await postsRepository.deletePost(id);
+  if (isDeleted) {
     res.send(204);
   } else {
     res.send(404);

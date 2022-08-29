@@ -47,7 +47,7 @@ export const postsRepository = {
       bloggerId,
       bloggerName: 'Name of Blogger',
     };
-    const post = await client.db('blog').collection('post').insertOne(newPost);
+    const post = await client.db('blog').collection<Post>('post').insertOne(newPost);
 
     return newPost;
   },

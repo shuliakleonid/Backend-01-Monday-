@@ -1,141 +1,149 @@
-import Router from 'express'
-import {basicAuth} from '../helpers';
+import Router from 'express';
+import { basicAuth } from '../helpers';
+import { bloggersRepository } from '../repositories/bloggers';
+import { postsRepository } from '../repositories/posts';
 
 const router = Router();
 
-export const bloggers = [
-    {
-        id: 0,
-        name: 'Anna ',
-        youtubeUrl: 'string'
-    },
-    {
-        id: 1,
-        name: 'Ken ',
-        youtubeUrl: 'string'
-    },
-    {
-        id: 2,
-        name: 'Tina ',
-        youtubeUrl: 'string'
-    },
-    {
-        id: 3,
-        name: 'Dim ',
-        youtubeUrl: 'string'
-    },
-    {
-        id: 4,
-        name: 'Melon ',
-        youtubeUrl: 'string'
-    },
-]
-
-const errorMessage = (field: string, message: string) => {
-    return {
-                "message": message,
-                "field": field
-            }
-
+export type Bloggers = {
+    id: number;
+    name: string;
+    youtubeUrl: string;
 }
 
-router.get('', (req, res) => {
-    
-    res.send(bloggers)
-})
+export const bloggers = [
+  {
+    id: 0,
+    name: 'Anna ',
+    youtubeUrl: 'string',
+  },
+  {
+    id: 1,
+    name: 'Ken ',
+    youtubeUrl: 'string',
+  },
+  {
+    id: 2,
+    name: 'Tina ',
+    youtubeUrl: 'string',
+  },
+  {
+    id: 3,
+    name: 'Dim ',
+    youtubeUrl: 'string',
+  },
+  {
+    id: 4,
+    name: 'Melon ',
+    youtubeUrl: 'string',
+  },
+];
 
-router.get('/:id', (req, res) => {
-    const id = +req.params.id
-    const blogger = bloggers.find((v) => v.id === id)
-    if (blogger) {
-        res.send(blogger)
-    } else {
-        res.send(404)
-    }
+const errorMessage = (field: string, message: string) => {
+  return {
+    message: message,
+    field: field,
+  };
+};
 
-})
+router.get('', async (req, res) => {
+  const title = req.query.title?.toString();
+  const bloggers = await bloggersRepository.findBloggers(title);
+  res.send(bloggers);
+});
 
-router.get('/:bloggersId/posts', (req, res)=> {
+router.get('/:id', async (req, res) => {
+  const id = +req.params.id;
+  const blogger = await bloggersRepository.findBloggerById(id);
+  if (blogger) {
+    res.send(blogger);
+  } else {
+    res.send(404);
+  }
+});
 
-})
+router.post('', basicAuth, async (req, res) => {
+  const pattern =
+    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
 
-router.post('',basicAuth, (req, res) => {
-    const pattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
+  const { name, youtubeUrl } = req.body;
+  const isValidYoutubeLink = pattern.test(youtubeUrl);
+  const errorsMessages = [];
 
-    const {name, youtubeUrl} = req.body
-    const isValidYoutubeLink = pattern.test(youtubeUrl)
-    const errorsMessages = []
+  if (!name?.trim() || name.length >= 15) {
+    errorsMessages.push(
+      errorMessage('name', 'Title is too long max 40 symbols')
+    );
+  }
+  if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink)
+    errorsMessages.push(errorMessage('youtubeUrl', 'shortDescription'));
 
+  if (errorsMessages.length > 0)
+    return res.status(400).send({ errorsMessages: errorsMessages });
 
-    if (!name?.trim() || name.length >= 15) {
-        errorsMessages.push(errorMessage('name', 'Title is too long max 40 symbols'))
-    }
-    if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink) errorsMessages.push(errorMessage('youtubeUrl', 'shortDescription'))
+  if (name?.trim() && youtubeUrl) {
+   
+    const newBlogger = await bloggersRepository.createBlogger(name, youtubeUrl);
 
-    if (errorsMessages.length > 0) return res.status(400).send({errorsMessages:errorsMessages})
+    res.status(201).send(newBlogger);
+  } else {
+    res.status(400).send({
+      errorsMessages: [
+        {
+          message: 'No title , you should pass valid blogger',
+          field: 'title',
+        },
+      ],
+    });
+  }
+});
 
-    if (name?.trim() && youtubeUrl) {
-        const newBlogger= {
-            id: bloggers.length + 1,
-            name,
-            youtubeUrl
-        }
-        bloggers.push(newBlogger)
-        res.status(201).send(newBlogger)
-    } else {
-        res.status(400).send({
-            "errorsMessages": [
-                {
-                    "message": "No title , you should pass valid blogger",
-                    "field": "title"
-                }
-            ]
-        })
-    }
-})
+router.put('/:id', basicAuth, async (req, res) => {
+  const pattern =
+    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
 
-router.put('/:id',basicAuth, (req, res) => {
+  const { name, youtubeUrl } = req.body;
+  const isValidYoutubeLink = pattern.test(youtubeUrl);
+  const id = +req.params.id;
+  const errorsMessages = [];
 
-    const pattern = /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/
+  if (!name?.trim() || name.length > 15)
+    errorsMessages.push(
+      errorMessage('name', 'Title is too long max 40 symbols')
+    );
+  if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink)
+    errorsMessages.push(errorMessage('youtubeUrl', 'shortDescription'));
 
-    const {name, youtubeUrl} = req.body
-    const isValidYoutubeLink = pattern.test(youtubeUrl)
-    const id = +req.params.id
-    const errorsMessages = []
+  if (errorsMessages.length > 0)
+    return res.status(400).send({ errorsMessages: errorsMessages });
 
-    if (!name?.trim() || name.length > 15) errorsMessages.push(errorMessage('name', 'Title is too long max 40 symbols'))
-    if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink) errorsMessages.push(errorMessage('youtubeUrl', 'shortDescription'))
+  const isUpdated = await bloggersRepository.updateBlogger(
+    id,
+    name,
+    youtubeUrl
+  );
+  if (isUpdated) {
+    res.send(204);
+  } else {
+    res.status(404).send({
+      errorsMessages: [
+        {
+          message: 'No title , you should pass valid title',
+          field: 'title',
+        },
+      ],
+    });
+  }
+});
 
-   if(errorsMessages.length > 0) return res.status(400).send({errorsMessages:errorsMessages})
+router.delete('/:id', basicAuth, async (req, res) => {
+  const id = +req.params.id;
+  const isDeleted = await bloggersRepository.deleteBloggers(id);
+  if (isDeleted) {
+    res.send(204);
+  } else {
+    res.send(404);
+  }
+});
 
-    const index = bloggers.findIndex(v => v.id === id)
-    if (index >= 0) {
-        console.log(bloggers[index])
-        console.log({...bloggers[index], ...req.body})
-        bloggers[index] = {...bloggers[index], ...req.body}
-        res.send(204)
-    } else {
-        res.status(404).send({
-            "errorsMessages": [
-                {
-                    "message": "No title , you should pass valid title",
-                    "field": "title"
-                }
-            ]
-        })
-    }
-
-})
-router.delete('/:id',basicAuth, (req, res) => {
-    const id = +req.params.id
-    const index = bloggers.findIndex(v => v.id === id)
-    if (index >= 0) {
-        bloggers.splice(index, 1)
-        res.send(204)
-    } else {
-        res.send(404)
-    }
-})
-
-
-export {router as bloggersRouter}
+export { router as bloggersRouter };
