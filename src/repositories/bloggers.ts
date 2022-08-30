@@ -41,7 +41,7 @@ export const bloggersRepository = {
     .db('blog')
     .collection<Bloggers>('bloggers')
     .count({})
-  }
+  },
 
   async findBloggerById(id: number): Promise<Bloggers | null> {
     const blogger = await client
