@@ -63,21 +63,22 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/:bloggerId/posts', async (req, res) => {
-  const title = req.query.title?.toString();
   const pageNumber = req.query.pageNumber || 0;
   const pageSize = req.query.PageSize || 10;
-
-  const pagination = {
-    pagesCount: pageNumber,
-    page: 0,
-    pageSize: pageSize,
-    totalCount: 0,
-  };
-
-  const bloggers = await bloggersRepository.findBloggers(title, +pageNumber, +pageSize);
+  const skip = (+pageNumber - 1) * +pageSize ;
+  const bloggers = await bloggersRepository.findBloggersWithPagination( skip, +pageSize);
+  const totalCount = await bloggersRepository.getQuantityBloggers();
+  const page = Math.ceil(totalCount / +pageSize)
+  
+    const pagination = {
+      pagesCount: pageNumber,
+      page,
+      pageSize,
+      totalCount,
+    };
 
   if (bloggers) {
-    res.send(bloggers);
+    res.send({items:bloggers,pagination});
   } else {
     res.send(404);
   }

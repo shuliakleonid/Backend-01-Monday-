@@ -7,7 +7,7 @@ import { Post } from './../routes/posts';
 import { client } from './db';
 
 export const bloggersRepository = {
-  async findBloggers(title: string | null | undefined, pageNumber?: number, pageSize?: number): Promise<Bloggers[]> {
+  async findBloggers(title: string | null | undefined): Promise<Bloggers[]> {
     if (title) {
       return client
         .db('blog')
@@ -15,9 +15,33 @@ export const bloggersRepository = {
         .find({ title: { $regex: title } })
         .toArray();
     } else {
-      return client.db('blog').collection<Bloggers>('bloggers').find({}).toArray();
+      return client
+        .db('blog')
+        .collection<Bloggers>('bloggers')
+        .find({})
+        .toArray();
     }
   },
+
+  async findBloggersWithPagination(
+    skipQuantity: number,
+    pageSize: number
+  ): Promise<Bloggers[]> {
+    return client
+      .db('blog')
+      .collection<Bloggers>('bloggers')
+      .find({})
+      .skip(skipQuantity)
+      .limit(pageSize)
+      .toArray();
+  },
+  
+  async getQuantityBloggers(){
+    return client
+    .db('blog')
+    .collection<Bloggers>('bloggers')
+    .count({})
+  }
 
   async findBloggerById(id: number): Promise<Bloggers | null> {
     const blogger = await client
@@ -31,14 +55,11 @@ export const bloggersRepository = {
     }
   },
 
-  async createBlogger(
-    name: string,
-    youtubeUrl: string,
-  ): Promise<Bloggers> {
+  async createBlogger(name: string, youtubeUrl: string): Promise<Bloggers> {
     const newBlogger = {
       id: +new Date(),
       name,
-      youtubeUrl
+      youtubeUrl,
     };
     const blogger = await client
       .db('blog')
