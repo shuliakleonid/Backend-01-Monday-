@@ -63,11 +63,12 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/:bloggerId/posts', async (req, res) => {
+  const bloggerId = +req.params.bloggerId;
   const pageNumber = req.query.pageNumber || 0;
   const pageSize = req.query.PageSize || 10;
   const skip = (+pageNumber - 1) * +pageSize ;
-  const bloggers = await bloggersRepository.findBloggersWithPagination( skip, +pageSize);
-  const totalCount = await bloggersRepository.getQuantityBloggers();
+  const bloggers = await bloggersRepository.findBloggersWithPagination(bloggerId, skip, +pageSize);
+  const totalCount = await bloggersRepository.getQuantityPostsOfBlogger(bloggerId);
   const page = Math.ceil(totalCount / +pageSize)
   
     const pagination = {
