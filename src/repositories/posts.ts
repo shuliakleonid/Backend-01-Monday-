@@ -55,7 +55,7 @@ export const postsRepository = {
     }
   },
 
-  async getQuantityPostsOfBlogger(id: number) {
+  async getQuantityPostsOfBlogger(id: number):Promise<number> {
     return client.db('blog').collection<Post>('post').count({ id: id });
   },
 
