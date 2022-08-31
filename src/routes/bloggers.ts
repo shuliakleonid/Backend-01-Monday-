@@ -136,7 +136,7 @@ router.post(
 
 router.put('/:id', basicAuth, async (req, res) => {
   const pattern =
-    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
+  /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
 
   const { name, youtubeUrl } = req.body;
   const isValidYoutubeLink = pattern.test(youtubeUrl);
