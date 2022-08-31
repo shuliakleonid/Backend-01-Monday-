@@ -2,7 +2,6 @@ import Router from 'express';
 import { basicAuth } from '../helpers';
 import { bloggersRepository } from '../repositories/bloggers';
 import { postsRepository } from '../repositories/posts';
-import { bloggers } from './bloggers';
 
 const router = Router();
 
@@ -14,6 +13,7 @@ export type Post = {
   bloggerId: number;
   bloggerName: string;
 };
+
 
 router.get('', async (req, res) => {
   const title = req.query.title?.toString();
@@ -85,7 +85,7 @@ router.put('/:id', basicAuth, async (req, res) => {
 
   const id = +req.params.id;
   const { title, shortDescription, content, bloggerId } = req.body;
-  const blogger = bloggers.find((b) => b.id === bloggerId);
+  const blogger = await bloggersRepository.findBloggerById(bloggerId)
 
   if (!title?.trim() || title?.length >= 30)
     errorsMessages.push(

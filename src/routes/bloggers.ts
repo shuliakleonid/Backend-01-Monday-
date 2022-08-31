@@ -1,7 +1,6 @@
 import { descriptionValidator } from './../validators/description';
 import { titleValidator } from './../validators/title';
 import Router from 'express';
-import { body, validationResult } from 'express-validator';
 import { basicAuth } from '../helpers';
 import { bloggersRepository } from '../repositories/bloggers';
 import { postsRepository } from '../repositories/posts';
@@ -69,27 +68,31 @@ router.get('/:bloggerId/posts', async (req, res) => {
 
 router.post('', basicAuth, async (req, res) => {
   const pattern =
-    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/;
+    /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube(-nocookie)?\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
 
   const { name, youtubeUrl } = req.body;
+  console.log('youtubeUrl: ', youtubeUrl);
+  console.log('name: ', name);
   const isValidYoutubeLink = pattern.test(youtubeUrl);
-  const errorsMessages = [];
+  const errorsMessages: { message: string; field: string; }[] = [];
 
   if (!name?.trim() || name.length >= 15) {
     errorsMessages.push(
       errorMessage('name', 'Title is too long max 40 symbols')
-    );
-  }
-  if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink)
+      );
+    }
+    console.log('isValidYoutubeLink: ', isValidYoutubeLink);
+    if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink)
     errorsMessages.push(errorMessage('youtubeUrl', 'shortDescription'));
 
-  if (errorsMessages.length > 0)
+    if (errorsMessages.length > 0)
     return res.status(400).send({ errorsMessages: errorsMessages });
 
-  if (name?.trim() && youtubeUrl) {
-    const newBlogger = await bloggersRepository.createBlogger(name, youtubeUrl);
 
-    res.status(201).send(newBlogger);
+    if (name?.trim() && youtubeUrl) {
+      const newBlogger = await bloggersRepository.createBlogger(name, youtubeUrl);
+
+      res.status(201).send(newBlogger);
   } else {
     res.status(400).send({
       errorsMessages: [
