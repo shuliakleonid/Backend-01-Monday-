@@ -2,7 +2,7 @@ import { MongoClient } from 'mongodb';
 import { Bloggers } from '../routes/bloggers';
 import { Post } from '../routes/posts';
 
-const mongoUri = process.env.mongoURI || 'mongodb://localhost:27017';
+const mongoUri = process.env.mongoURI || 'mongodb+srv://Zeleny:Zeleny3416240@cluster0.gt3qw.mongodb.net/?retryWrites=true&w=majority';
 
 console.log('mongoUri', mongoUri);
 

@@ -1,32 +1,36 @@
 import { Bloggers } from './../routes/bloggers';
-import Router from 'express';
-import { pathToFileURL } from 'url';
-import { basicAuth } from '../helpers';
-import { bloggers } from '../routes/bloggers';
-import { Post } from './../routes/posts';
 import { bloggersCollection, client } from './db';
 
-
-
 export const bloggersRepository = {
-  async findBloggers(
-    title: string | null | undefined,
-    pageNumber?: number,
-    pageSize?: number
-  ): Promise<Bloggers[]> {
+  async findBloggers(title: string | null | undefined): Promise<Bloggers[]> {
     if (title) {
-      return bloggersCollection.find({ title: { $regex: title } }).toArray();
+      return bloggersCollection
+        .find(
+          { title: { $regex: title } },
+          {
+            projection: { _id: 0 },
+          }
+        )
+        .toArray();
     } else {
-      return client
-        .db('blog')
-        .collection<Bloggers>('bloggers')
-        .find({})
+      return bloggersCollection
+        .find(
+          {},
+          {
+            projection: { _id: 0 },
+          }
+        )
         .toArray();
     }
   },
 
   async findBloggerById(id: number): Promise<Bloggers | null> {
-    const blogger = await bloggersCollection.findOne({ id: id });
+    const blogger = await bloggersCollection.findOne(
+      { id: id },
+      {
+        projection: { _id: 0 },
+      }
+    );
     if (blogger) {
       return blogger;
     } else {
@@ -40,8 +44,10 @@ export const bloggersRepository = {
       name,
       youtubeUrl,
     };
-    const blogger = await bloggersCollection.insertOne(newBlogger);
+    await bloggersCollection.insertOne(newBlogger);
 
+    // @ts-ignore
+    delete newBlogger._id;
     return newBlogger;
   },
 
