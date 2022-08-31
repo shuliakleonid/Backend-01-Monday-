@@ -11,34 +11,6 @@ export type Bloggers = {
   youtubeUrl: string;
 };
 
-export const bloggers = [
-  {
-    id: 0,
-    name: 'Anna ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 1,
-    name: 'Ken ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 2,
-    name: 'Tina ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 3,
-    name: 'Dim ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 4,
-    name: 'Melon ',
-    youtubeUrl: 'string',
-  },
-];
-
 const errorMessage = (field: string, message: string) => {
   return {
     message: message,
@@ -48,13 +20,18 @@ const errorMessage = (field: string, message: string) => {
 
 router.get('', async (req, res) => {
   const title = req.query.title?.toString();
+
   const bloggers = await bloggersRepository.findBloggers(title);
+   
   res.send(bloggers);
 });
 
 router.get('/:id', async (req, res) => {
+
   const id = +req.params.id;
+
   const blogger = await bloggersRepository.findBloggerById(id);
+
   if (blogger) {
     res.send(blogger);
   } else {
@@ -74,7 +51,11 @@ router.get('/:bloggerId/posts', async (req, res) => {
     totalCount: 0,
   };
 
-  const bloggers = await bloggersRepository.findBloggers(title, +pageNumber, +pageSize);
+  const bloggers = await bloggersRepository.findBloggers(
+    title,
+    +pageNumber,
+    +pageSize
+  );
 
   if (bloggers) {
     res.send(bloggers);

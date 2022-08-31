@@ -3,33 +3,23 @@ import { pathToFileURL } from 'url';
 import { basicAuth } from '../helpers';
 import { bloggers } from '../routes/bloggers';
 import { Post } from './../routes/posts';
-import { client } from './db';
+import { client, postsCollection } from './db';
+
 
 export const postsRepository = {
   async findPosts(title: string | null | undefined): Promise<Post[]> {
     if (title) {
-
-      return client
-        .db('blog')
-        .collection<Post>('posts')
-        .find({ title: { $regex: title } })
-        .toArray();
+      return postsCollection.find({ title: { $regex: title } }).toArray();
     } else {
-
-      return client.db('blog').collection<Post>('posts').find({}).toArray();
+      return postsCollection.find({}).toArray();
     }
   },
 
   async findPostById(id: number): Promise<Post | null> {
-    const post = await client
-      .db('blog')
-      .collection<Post>('posts')
-      .findOne({ id: id });
+    const post = await postsCollection.findOne({ id: id });
     if (post) {
-
       return post;
     } else {
-
       return null;
     }
   },
@@ -47,7 +37,7 @@ export const postsRepository = {
       bloggerId,
       bloggerName: 'Name of Blogger',
     };
-    const post = await client.db('blog').collection<Post>('post').insertOne(newPost);
+    const post = await postsCollection.insertOne(newPost);
 
     return newPost;
   },
@@ -58,28 +48,22 @@ export const postsRepository = {
     content: string,
     bloggerId: number
   ): Promise<boolean> {
-    const result = await client
-      .db('blog')
-      .collection<Post>('posts')
-      .updateOne(
-        { id: id },
-        {
-          $set: {
-            title: title,
-            content: content,
-            bloggerId: bloggerId,
-          },
-        }
-      );
+    const result = await postsCollection.updateOne(
+      { id: id },
+      {
+        $set: {
+          title: title,
+          content: content,
+          bloggerId: bloggerId,
+        },
+      }
+    );
 
     return result.matchedCount === 1;
   },
 
   async deletePost(id: number): Promise<boolean> {
-    const result = await client
-      .db('blog')
-      .collection<Post>('posts')
-      .deleteOne({ id: id });
+    const result = await postsCollection.deleteOne({ id: id });
 
     return result.deletedCount === 1;
   },

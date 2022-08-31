@@ -88,7 +88,6 @@ router.post('', basicAuth, async (req, res) => {
 
   const blogger = await bloggersRepository.findBloggerById(bloggerId);
 
-
   if (!title?.trim() || title.length >= 30)
     errorsMessages.push(
       errorMessage('title', 'Title is too long max 40 symbols')
@@ -103,7 +102,6 @@ router.post('', basicAuth, async (req, res) => {
     return res.status(400).send({ errorsMessages: errorsMessages });
 
   if (title && shortDescription && content && bloggerId) {
-   
     const createdPost = await postsRepository.createPost(
       title,
       content,
@@ -142,7 +140,12 @@ router.put('/:id', basicAuth, async (req, res) => {
   if (errorsMessages.length > 0)
     return res.status(400).send({ errorsMessages: errorsMessages });
 
-  const isUpdated = await postsRepository.updatePost(id,title, content, bloggerId);
+  const isUpdated = await postsRepository.updatePost(
+    id,
+    title,
+    content,
+    bloggerId
+  );
 
   if (isUpdated) {
     res.send(204);
