@@ -76,13 +76,13 @@ router.post('', basicAuth, async (req, res) => {
   const isValidYoutubeLink = pattern.test(youtubeUrl);
   const errorsMessages: { message: string; field: string; }[] = [];
 
-  if (!name?.trim() || name.length >= 15) {
+  if (!name?.trim() || name?.length >= 15) {
     errorsMessages.push(
       errorMessage('name', 'Title is too long max 40 symbols')
       );
     }
     console.log('isValidYoutubeLink: ', isValidYoutubeLink);
-    if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink)
+    if (!youtubeUrl || youtubeUrl?.length >= 100 || !isValidYoutubeLink)
     errorsMessages.push(errorMessage('youtubeUrl', 'shortDescription'));
 
     if (errorsMessages.length > 0)
@@ -147,7 +147,7 @@ router.put('/:id', basicAuth, async (req, res) => {
     errorsMessages.push(
       errorMessage('name', 'Title is too long max 40 symbols')
     );
-  if (!youtubeUrl || youtubeUrl.length >= 100 || !isValidYoutubeLink)
+  if (!youtubeUrl || youtubeUrl?.length >= 100 || !isValidYoutubeLink)
     errorsMessages.push(errorMessage('youtubeUrl', 'shortDescription'));
 
   if (errorsMessages.length > 0)
