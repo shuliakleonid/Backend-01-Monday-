@@ -91,6 +91,7 @@ router.post('', basicAuth, async (req, res) => {
 
     if (name?.trim() && youtubeUrl) {
       const newBlogger = await bloggersRepository.createBlogger(name, youtubeUrl);
+      console.log('newBlogger: ', newBlogger);
 
       res.status(201).send(newBlogger);
   } else {

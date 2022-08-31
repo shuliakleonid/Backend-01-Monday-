@@ -7,9 +7,12 @@ export const bloggersRepository = {
       return client
         .db('blog')
         .collection<Bloggers>('bloggers')
-        .find({ title: { $regex: title } }, {
-          projection:{ _id: 0 }
-      })
+        .find(
+          { title: { $regex: title } },
+          {
+            projection: { _id: 0 },
+          }
+        )
         .toArray();
     } else {
       return client
@@ -48,11 +51,13 @@ export const bloggersRepository = {
       name,
       youtubeUrl,
     };
-    const blogger = await client
+
+    await client
       .db('blog')
       .collection<Bloggers>('bloggers')
       .insertOne(newBlogger);
-
+      // @ts-ignore
+    delete newBlogger._id;
     return newBlogger;
   },
 
