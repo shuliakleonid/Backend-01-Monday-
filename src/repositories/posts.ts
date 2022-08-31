@@ -34,6 +34,33 @@ export const postsRepository = {
     }
   },
 
+  async findPostsBloggersWithPagination(id:number,
+    skipQuantity: number,
+    pageSize: number
+  ): Promise<Post[] | null> {
+   const posts =await client
+      .db('blog')
+      .collection<Post>('post')
+      .find({id: id})
+      .skip(skipQuantity)
+      .limit(pageSize)
+      .toArray();
+      if (posts) {
+
+        return posts;
+      } else {
+  
+        return null;
+      }
+  },
+
+  async getQuantityPostsOfBlogger(id: number){
+    return client
+    .db('blog')
+    .collection<Post>('post')
+    .count({id: id})
+  },
+
   async createPost(
     title: string,
     content: string,

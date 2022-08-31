@@ -23,26 +23,6 @@ export const bloggersRepository = {
     }
   },
 
-  async findBloggersWithPagination(id:number,
-    skipQuantity: number,
-    pageSize: number
-  ): Promise<Bloggers[]> {
-    return client
-      .db('blog')
-      .collection<Bloggers>('bloggers')
-      .find({id: id})
-      .skip(skipQuantity)
-      .limit(pageSize)
-      .toArray();
-  },
-  
-  async getQuantityPostsOfBlogger(id: number){
-    return client
-    .db('blog')
-    .collection<Bloggers>('bloggers')
-    .count({id: id})
-  },
-
   async findBloggerById(id: number): Promise<Bloggers | null> {
     const blogger = await client
       .db('blog')
