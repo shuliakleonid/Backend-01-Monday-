@@ -77,7 +77,8 @@ export const postsRepository = {
       .db('blog')
       .collection<Post>('post')
       .insertOne(newPost);
-
+    // @ts-ignore
+    delete newPost._id
     return newPost;
   },
 
