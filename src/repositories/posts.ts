@@ -1,7 +1,3 @@
-import Router from 'express';
-import { pathToFileURL } from 'url';
-import { basicAuth } from '../helpers';
-import { bloggers } from '../routes/bloggers';
 import { Post } from './../routes/posts';
 import { client } from './db';
 
