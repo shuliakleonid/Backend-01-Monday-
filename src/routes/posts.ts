@@ -15,49 +15,6 @@ export type Post = {
   bloggerName: string;
 };
 
-const posts: Post[] = [
-  {
-    id: 0,
-    title: 'Title of post ',
-    shortDescription: 'Description of post',
-    content: 'Content of post',
-    bloggerId: 0,
-    bloggerName: 'Name of Blogger',
-  },
-  {
-    id: 1,
-    title: 'Title of post ',
-    shortDescription: 'Description of post',
-    content: 'Content of post',
-    bloggerId: 1,
-    bloggerName: 'Name of Blogger',
-  },
-  {
-    id: 2,
-    title: 'Title of post ',
-    shortDescription: 'Description of post',
-    content: 'Content of post',
-    bloggerId: 2,
-    bloggerName: 'Name of Blogger',
-  },
-  {
-    id: 3,
-    title: 'Title of post ',
-    shortDescription: 'Description of post',
-    content: 'Content of post',
-    bloggerId: 3,
-    bloggerName: 'Name of Blogger',
-  },
-  {
-    id: 4,
-    title: 'Title of post ',
-    shortDescription: 'Description of post',
-    content: 'Content of post',
-    bloggerId: 4,
-    bloggerName: 'Name of Blogger',
-  },
-];
-
 router.get('', async (req, res) => {
   const title = req.query.title?.toString();
   const posts = await postsRepository.findPosts(title);
@@ -103,10 +60,11 @@ router.post('', basicAuth, async (req, res) => {
     return res.status(400).send({ errorsMessages: errorsMessages });
 
   if (title && shortDescription && content && bloggerId) {
-   
+
     const createdPost = await postsRepository.createPost(
       title,
       content,
+      shortDescription,
       bloggerId
     );
     res.status(201).send(createdPost);

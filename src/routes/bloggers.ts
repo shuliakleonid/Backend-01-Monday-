@@ -1,7 +1,12 @@
+import { descriptionValidator } from './../validators/description';
+import { titleValidator } from './../validators/title';
 import Router from 'express';
+import { body, validationResult } from 'express-validator';
 import { basicAuth } from '../helpers';
 import { bloggersRepository } from '../repositories/bloggers';
 import { postsRepository } from '../repositories/posts';
+import { contentValidator } from '../validators/content';
+import { error } from '../validators/error-post';
 
 const router = Router();
 
@@ -11,33 +16,6 @@ export type Bloggers = {
   youtubeUrl: string;
 };
 
-export const bloggers = [
-  {
-    id: 0,
-    name: 'Anna ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 1,
-    name: 'Ken ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 2,
-    name: 'Tina ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 3,
-    name: 'Dim ',
-    youtubeUrl: 'string',
-  },
-  {
-    id: 4,
-    name: 'Melon ',
-    youtubeUrl: 'string',
-  },
-];
 
 const errorMessage = (field: string, message: string) => {
   return {
@@ -66,20 +44,24 @@ router.get('/:bloggerId/posts', async (req, res) => {
   const bloggerId = +req.params.bloggerId;
   const pageNumber = req.query.pageNumber || 0;
   const pageSize = req.query.PageSize || 10;
-  const skip = (+pageNumber - 1) * +pageSize ;
-  const bloggers = await postsRepository.findPostsBloggersWithPagination(bloggerId, skip, +pageSize);
+  const skip = (+pageNumber - 1) * +pageSize;
+  const bloggers = await postsRepository.findPostsBloggersWithPagination(
+    bloggerId,
+    skip,
+    +pageSize
+  );
   const totalCount = await postsRepository.getQuantityPostsOfBlogger(bloggerId);
-  const page = Math.ceil(totalCount / +pageSize)
-  
-    const pagination = {
-      pagesCount: pageNumber,
-      page,
-      pageSize,
-      totalCount,
-    };
+  const page = Math.ceil(totalCount / +pageSize);
+
+  const pagination = {
+    pagesCount: pageNumber,
+    page,
+    pageSize,
+    totalCount,
+  };
 
   if (bloggers) {
-    res.send({items:bloggers,pagination});
+    res.send({ items: bloggers, pagination });
   } else {
     res.send(404);
   }
@@ -119,6 +101,35 @@ router.post('', basicAuth, async (req, res) => {
     });
   }
 });
+
+router.post(
+  '/:bloggerId/posts',
+  basicAuth,
+  titleValidator,
+  descriptionValidator,
+  contentValidator,
+  error,
+  async (req, res) => {
+    const { title, shortDescription, content } = req.body;
+    const bloggerId = +req.params?.bloggerId;
+    if (!bloggerId) res.send(400);
+
+    const post = await postsRepository.createPost(
+      title,
+      content,
+      shortDescription,
+      bloggerId
+    );
+
+    console.log('post', post);
+
+    if (post) {
+      res.send(post);
+    } else {
+      res.send(404);
+    }
+  }
+);
 
 router.put('/:id', basicAuth, async (req, res) => {
   const pattern =
