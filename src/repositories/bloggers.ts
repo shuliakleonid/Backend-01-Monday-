@@ -7,13 +7,20 @@ export const bloggersRepository = {
       return client
         .db('blog')
         .collection<Bloggers>('bloggers')
-        .find({ title: { $regex: title } })
+        .find({ title: { $regex: title } }, {
+          projection:{ _id: 0 }
+      })
         .toArray();
     } else {
       return client
         .db('blog')
         .collection<Bloggers>('bloggers')
-        .find({})
+        .find(
+          {},
+          {
+            projection: { _id: 0 },
+          }
+        )
         .toArray();
     }
   },
@@ -22,7 +29,12 @@ export const bloggersRepository = {
     const blogger = await client
       .db('blog')
       .collection<Bloggers>('bloggers')
-      .findOne({ id: id });
+      .findOne(
+        { id: id },
+        {
+          projection: { _id: 0 },
+        }
+      );
     if (blogger) {
       return blogger;
     } else {

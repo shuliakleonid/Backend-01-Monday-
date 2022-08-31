@@ -18,7 +18,12 @@ export const postsRepository = {
     const post = await client
       .db('blog')
       .collection<Post>('posts')
-      .findOne({ id: id });
+      .findOne(
+        { id: id },
+        {
+          projection: { _id: 0 },
+        }
+      );
     if (post) {
       return post;
     } else {
@@ -34,7 +39,12 @@ export const postsRepository = {
     const posts = await client
       .db('blog')
       .collection<Post>('post')
-      .find({ id: id })
+      .find(
+        { id: id },
+        {
+          projection: { _id: 0 },
+        }
+      )
       .skip(skipQuantity)
       .limit(pageSize)
       .toArray();
