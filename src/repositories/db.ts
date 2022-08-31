@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-const mongoUri = process.env.mongoURI || 'mongodb://localhost:27017';
+const mongoUri = process.env.mongoURI || 'mongodb+srv://Zeleny:Zeleny3416240@cluster0.gt3qw.mongodb.net/?retryWrites=true&w=majority';
 
 console.log('mongoUri', mongoUri);
 
